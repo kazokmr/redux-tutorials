@@ -5,8 +5,12 @@ import store from "./app/store";
 import {Provider} from "react-redux";
 import {worker} from "./api/server";
 import App from "./App";
+import {fetchUsers} from "./features/users/usersSlice";
 
 worker.start({onUnhandledRequest: "bypass"})
+
+// User情報を検索する
+store.dispatch(fetchUsers());
 
 ReactDom.render(
   <React.StrictMode>
