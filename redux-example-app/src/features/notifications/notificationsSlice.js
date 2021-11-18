@@ -19,15 +19,26 @@ export const fetchNotifications = createAsyncThunk(
 const notificationSlice = createSlice({
   name: "notifications",
   initialState: [],
-  reducers: {},
+  reducers: {
+    allNotificationsRead(state, action) {
+      state.forEach(notification => {
+        notification.read = true
+      });
+    }
+  },
   extraReducers: {
     // 新しい通知を追加して最新順にソートする
     [fetchNotifications.fulfilled]: (state, action) => {
       state.push(...action.payload);
+      state.forEach(notification => {
+        notification.isNew = !notification.read;
+      });
       state.sort((a, b) => b.date.localeCompare(a.date));
     }
   }
 });
+
+export const {allNotificationsRead} = notificationSlice.actions;
 
 export default notificationSlice.reducer;
 
