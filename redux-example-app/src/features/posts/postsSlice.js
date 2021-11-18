@@ -1,11 +1,19 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice
+} from "@reduxjs/toolkit";
 import {client} from "../../api/client";
 
-const initialState = {
-  posts: [],
+const postsAdapter = createEntityAdapter({
+  sortComparer: (a, b) => b.date.localeCompare(a.date)
+});
+
+const initialState = postsAdapter.getInitialState({
   status: "idle",
   error: null
-};
+});
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   const response = await client.get("/fakeApi/posts");
@@ -25,14 +33,14 @@ const postSlice = createSlice({
   reducers: {
     reactionAdded(state, action) {
       const {postId, reaction} = action.payload;
-      const existingPost = state.posts.find(post => post.id === postId);
+      const existingPost = state.entities[postId];
       if (existingPost) {
         existingPost.reactions[reaction]++;
       }
     },
     postUpdated(state, action) {
       const {id, title, content} = action.payload;
-      const existingPost = state.posts.find(post => post.id === id);
+      const existingPost = state.entities[id];
       if (existingPost) {
         existingPost.title = title;
         existingPost.content = content;
@@ -42,32 +50,41 @@ const postSlice = createSlice({
   extraReducers(builder) {
     // fetchPosts(AsyncThunk)の状態によってstateのプロパティを設定する
     builder
-      .addCase(fetchPosts.pending, (state, action) => {
+      .addCase(fetchPosts.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.posts = state.posts.concat(action.payload);
+        postsAdapter.upsertMany(state, action.payload);
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
-        state.posts.push(action.payload);
-      });
+      .addCase(addNewPost.fulfilled, postsAdapter.addOne);
   }
 });
 
-export const {postAdded, postUpdated, reactionAdded} = postSlice.actions
+export const {postUpdated, reactionAdded} = postSlice.actions
 
 export default postSlice.reducer
 
-/*これらの２つのSelectorのstateは、storeのstateを指す。
-  このため、store(にある).posts(slice stateの).posts(配列)という指定でpostsが繰り返されている
-  Tutorialではこれが"silly"だから、本来は配列はitemsとかdataなどにするべきだが今はこのままにしておくと言っている
- */
-export const selectAllPosts = state => state.posts.posts;
+/*createEntityAdapterは内部のID配列とEntitiesを基に、
+selectAll, selectById, selectIds の３つの関数を持つ（名称から意味はわかると思う）ので、
+関数にSelector名を付けて、外部からSelectorから呼び出す
+* */
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+  selectIds: selectPostIds
+} = postsAdapter.getSelectors(state => state.posts);
 
-export const selectPostById = (state, postId) =>
-  state.posts.posts.find(post => post.id === postId);
+/* createSelector でメモ化する
+* 第一引数で必要なパラメータを定義する。この場合は全てのpostsとuserIdなので、
+* postsは内部でselectAllPostsセレクタを利用し、userIdは外部から渡してもらう
+* 第二引数は受け取ったpostsとuserIdを使って必要な戻り値を返す(この場合はuserIdでフィルタリングした記事一覧)
+*  */
+export const selectPostsByUser = createSelector(
+  [selectAllPosts, (state, userId) => userId],
+  (posts, userId) => posts.filter(post => post.user === userId)
+);
