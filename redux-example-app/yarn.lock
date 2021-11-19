@@ -1523,10 +1523,10 @@
     "@types/set-cookie-parser" "^2.4.0"
     set-cookie-parser "^2.4.6"
 
-"@mswjs/data@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@mswjs/data/-/data-0.7.1.tgz#59de4ee45c7b3dfedddf3160343f169ef326c2bd"
-  integrity sha512-Iw1HNW2fjRLjHb+fPMzf+EDMhH7W+OGEUyTnPxb3IPGdJeuFimq0hBSWO6+Sjf5Q3KDTfFvlFKp1O1Amb6P6Yg==
+"@mswjs/data@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@mswjs/data/-/data-0.8.0.tgz#6d1598d5542774a7c41a6a3da27ecb4a073b07c7"
+  integrity sha512-Z8fxyupSDQjX7klTXgUurCbcYYIaQX9WkahMuFQS/oesWxeww4Ql1SWz3YVkzHso95Px4JYSpz9Yi/X24gcq6w==
   dependencies:
     "@types/lodash" "^4.14.172"
     "@types/md5" "^2.3.0"

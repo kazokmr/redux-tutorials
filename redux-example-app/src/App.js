@@ -20,7 +20,6 @@ function App() {
       <Navbar/>
       <div className="App">
         <Switch>
-          <Route exact path="/notifications" component={NotificationList}/>
           <Route
             exact
             path="/"
@@ -35,6 +34,7 @@ function App() {
           <Route exact path="/editPost/:postId" component={EditPostForm}/>
           <Route exact path="/users" component={UsersList}/>
           <Route exact path="/users/:userId" component={UserPage}/>
+          <Route exact path="/notifications" component={NotificationList}/>
           <Redirect to="/"/>
         </Switch>
       </div>
