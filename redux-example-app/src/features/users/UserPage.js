@@ -1,15 +1,31 @@
-import React from "react";
-import {useSelector} from "react-redux";
-import {selectUserById} from "./usersSlice";
+import React, {useMemo} from "react";
 import {Link} from "react-router-dom";
-import {selectPostsByUser} from "../posts/postsSlice";
+import {useSelector} from "react-redux";
+import {createSelector} from "@reduxjs/toolkit";
+import {selectUserById} from "./usersSlice";
+import {useGetPostsQuery} from "../api/apiSlice";
 
 export const UserPage = ({match}) => {
   const {userId} = match.params;
 
   const user = useSelector(state => selectUserById(state, userId));
-  // メモ化してuserIdまたは記事が更新された時だけ再レンダリングさせる
-  const postsForUser = useSelector(state => selectPostsByUser(state, userId));
+
+  // 抽出した結果を正しくメモ化するためにページ専用のセレクターを生成する
+  const selectPostsForUser = useMemo(() => {
+    return createSelector(
+      res => res.data,
+      (res, userId) => userId,
+      (data, userId) => data.filter(post => post.user === userId)
+    );
+  }, []);
+
+  // Postsクエリで検索される全記事から特定ユーザーが投稿した記事データだけを抽出する
+  const {postsForUser} = useGetPostsQuery(undefined, {
+    selectFromResult: result => ({
+      ...result,
+      postsForUser: selectPostsForUser(result, userId)
+    })
+  });
 
   const postTitles = postsForUser.map(post => (
     <li key={post.id}>

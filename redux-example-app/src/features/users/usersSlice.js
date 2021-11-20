@@ -1,31 +1,31 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSlice
-} from "@reduxjs/toolkit";
-import {client} from "../../api/client";
+import {createEntityAdapter, createSelector} from "@reduxjs/toolkit";
+import {apiSlice} from "../api/apiSlice";
 
 const usersAdapter = createEntityAdapter();
 
 const initialState = usersAdapter.getInitialState();
 
-export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  const response = await client.get("/fakeApi/users");
-  return response.data;
+// API Sliceを拡張して、usersの問い合わせを分割管理する
+export const extendedApiSlice = apiSlice.injectEndpoints({
+  endpoints: builder => ({
+    getUsers: builder.query({
+      query: () => "/users",
+      transformResponse: responseData =>
+        usersAdapter.setAll(initialState, responseData)
+    })
+  })
 });
 
-const userSlice = createSlice({
-  name: "users",
-  initialState,
-  reducers: {},
-  extraReducers(builder) {
-    builder.addCase(fetchUsers.fulfilled, usersAdapter.setAll);
-  }
-});
+export const {useGetUsersQuery} = extendedApiSlice;
 
-export default userSlice.reducer
+export const selectUsersResult = extendedApiSlice.endpoints.getUsers.select();
+
+const selectUsersData = createSelector(
+  selectUsersResult,
+  userResult => userResult.data
+);
 
 export const {
   selectAll: selectAllUsers,
   selectById: selectUserById
-} = usersAdapter.getSelectors(state => state.users);
+} = usersAdapter.getSelectors(state => selectUsersData(state) ?? initialState);
