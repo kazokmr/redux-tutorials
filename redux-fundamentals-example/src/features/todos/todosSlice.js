@@ -10,12 +10,12 @@ function nextTodoId(todos) {
 }
 
 export default function todosReducer(state = initialState, action) {
-  switch (action.type()) {
+  switch (action.type) {
     case "todos/todoAdded":
       return [
         ...state,
         {
-          id: nextTodoId(state.todos),
+          id: nextTodoId(state),
           text: action.payload,
           completed: false
         }
