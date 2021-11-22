@@ -23,6 +23,6 @@ export const includeMeaningOfLife = (createStore) => {
       }
     }
 
-    return {...store, getState: newGetState()}
+    return {...store, getState: newGetState}
   };
 };
