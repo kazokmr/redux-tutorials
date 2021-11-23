@@ -29,7 +29,7 @@ export default function filtersReducer(state = initiateState, action) {
 
           return {
             ...state,
-            colors: state.colors.concat(colors),
+            colors: state.colors.concat(color),
           }
         }
         case 'removed': {
