@@ -2,48 +2,79 @@ import {client} from "../../api/client";
 import {createSelector} from "reselect";
 import {StatusFilters} from "../filters/filtersSlice";
 
-const initialState = [];
+const initialState = {
+  status: 'idle',
+  entities: []
+};
 
 const todosReducer = (state = initialState, action) => {
   switch (action.type) {
     case "todos/todoAdded":
-      return [...state, action.payload]
+      return {
+        ...state,
+        entities: [...state.entities, action.payload]
+      }
     case "todos/todoToggled": {
-      return state.map(todo => {
-        if (todo.id !== action.payload) {
-          return todo;
-        }
-        return {
-          ...todo,
-          completed: !todo.completed
-        };
-      })
+      return {
+        ...state,
+        entities: state.entities.map(todo => {
+          if (todo.id !== action.payload) {
+            return todo;
+          }
+          return {
+            ...todo,
+            completed: !todo.completed
+          };
+        })
+      }
     }
     case "todos/colorSelected": {
       const {color, todoId} = action.payload;
-      return state.map(todo => {
-        if (todo.id !== todoId) {
-          return todo;
-        }
-        return {
-          ...todo,
-          color,
-        }
-      });
+      return {
+        ...state,
+        entities: state.entities.map(todo => {
+          if (todo.id !== todoId) {
+            return todo;
+          }
+          return {
+            ...todo,
+            color
+          }
+        })
+      };
     }
     case "todos/todoDeleted": {
-      return state.filter(todo => todo.id !== action.payload);
+      return {
+        ...state,
+        entities: state.entities.filter(todo => todo.id !== action.payload)
+      };
     }
     case "todos/allCompleted": {
-      return state.map(todo => {
-        return {...todo, completed: true}
-      });
+      return {
+        ...state,
+        entities: state.entities.map(todo => {
+          return {...todo, completed: true}
+        })
+      };
     }
     case "todos/completedCleared": {
-      return state.filter(todo => !todo.completed);
+      return {
+        ...state,
+        entities: state.entities.filter(todo => !todo.completed)
+      };
+    }
+    case "todos/todosLoading": {
+      return {
+        ...state,
+        status: "loading"
+      }
     }
     case "todos/todosLoaded": {
-      return action.payload;
+      return {
+        ...state,
+        status: "idle",
+        entities: action.payload
+      };
     }
     default:
       return state;
@@ -75,14 +106,39 @@ export const allTodoCompleted = () => ({type: "todos/allCompleted"});
 
 export const completedCleared = () => ({type: "todos/completedCleared"});
 
+export const todosLoading = () => ({type: "todos/todosLoading"});
+
 export const todosLoaded = todos => ({
   type: "todos/todosLoaded",
   payload: todos
 });
 
+// Thunk function
+export const fetchTodos = () => async dispatch => {
+  dispatch(todosLoading());
+  const response = await client.get("/fakeApi/todos");
+  dispatch(todosLoaded(response.todos));
+};
+
+export const saveNewTodo = (text) => async dispatch => {
+  const initialTodo = {text};
+  const response = await client.post("/fakeApi/todos", {todo: initialTodo});
+  dispatch(todoAdded(response.todo));
+};
+
 // Create Selector
+export const selectTodos = state => state.todos.entities;
+
+export const selectTodoById = (state, todoId) =>
+  selectTodos(state).find(todo => todo.id === todoId);
+
+export const selectTodoIds = createSelector(
+  selectTodos,
+  todos => todos.map(todo => todo.id)
+);
+
 export const selectFilteredTodos = createSelector(
-  state => state.todos,
+  selectTodos,
   state => state.filters,
   (todos, filters) => {
     const {status, colors} = filters;
@@ -103,24 +159,5 @@ export const selectFilteredTodoIds = createSelector(
   selectFilteredTodos,
   filteredTodos => filteredTodos.map(todo => todo.id)
 );
-
-// Thunk function
-export const fetchTodos = () =>
-  async dispatch => {
-    const response = await client.get("/fakeApi/todos");
-    dispatch(todosLoaded(response.todos));
-  };
-
-export const saveNewTodo = (text) =>
-  async dispatch => {
-    const initialTodo = {text};
-    const response = await client.post("/fakeApi/todos", {todo: initialTodo});
-    dispatch(todoAdded(response.todo));
-  };
-
-export const selectTodos = state => state.todos;
-
-export const selectTodoById = (state, todoId) =>
-  selectTodos(state).find(todo => todo.id === todoId);
 
 export default todosReducer;

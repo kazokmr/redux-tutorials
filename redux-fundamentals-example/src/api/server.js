@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { Server, Model, Factory, hasMany, RestSerializer } from 'miragejs'
+import {Factory, hasMany, Model, RestSerializer, Server} from 'miragejs'
 
 import faker from 'faker'
 import seedrandom from 'seedrandom'
@@ -45,9 +45,9 @@ const randomFromArray = (array) => {
 }
 
 const todoTemplates = [
-  { base: 'Buy $THING', values: ['milk', 'bread', 'cheese', 'toys'] },
-  { base: 'Clean $THING', values: ['house', 'yard', 'bedroom', 'car'] },
-  { base: 'Read $THING', values: ['newspaper', 'book', 'email'] },
+  {base: 'Buy $THING', values: ['milk', 'bread', 'cheese', 'toys']},
+  {base: 'Clean $THING', values: ['house', 'yard', 'bedroom', 'car']},
+  {base: 'Read $THING', values: ['newspaper', 'book', 'email']},
 ]
 
 const generateTodoText = () => {
@@ -60,7 +60,7 @@ const generateTodoText = () => {
 new Server({
   routes() {
     this.namespace = 'fakeApi'
-    //this.timing = 2000
+    this.timing = 2000
 
     this.resource('todos')
     this.resource('lists')
