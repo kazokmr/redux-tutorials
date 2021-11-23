@@ -2,7 +2,7 @@ import {client} from "../../api/client";
 
 const initialState = [];
 
-export default function todosReducer(state = initialState, action) {
+const todosReducer = (state = initialState, action) => {
   switch (action.type) {
     case "todos/todoAdded":
       return [...state, action.payload]
@@ -48,18 +48,48 @@ export default function todosReducer(state = initialState, action) {
   }
 };
 
-// Thunk function
-const fetchTodos = async (dispatch, getState) => {
-  const response = await client.get("/fakeApi/todos");
-  dispatch({type: "todos/todosLoaded", payload: response.todos});
-};
+// Action Creators
+export const todoAdded = todo => ({
+  type: "todos/todoAdded",
+  payload: todo
+});
 
-const saveNewTodo = (text) => {
-  return async (dispatch, getState) => {
+export const todoToggled = todoId => ({
+  type: "todos/todoToggled",
+  payload: todoId
+});
+
+export const todoColorSelected = (todoId, color) => ({
+  type: "todos/colorSelected",
+  payload: {color, todoId}
+});
+
+export const todoDeleted = todoId => ({
+  type: "todos/todoDeleted",
+  payload: todoId
+});
+
+export const allTodoCompleted = () => ({type: "todos/allCompleted"});
+
+export const completedCleared = () => ({type: "todos/completedCleared"});
+
+export const todosLoaded = todos => ({
+  type: "todos/todosLoaded",
+  payload: todos
+});
+
+// Thunk function
+export const fetchTodos = () =>
+  async dispatch => {
+    const response = await client.get("/fakeApi/todos");
+    dispatch(todosLoaded(response.todos));
+  };
+
+export const saveNewTodo = (text) =>
+  async dispatch => {
     const initialTodo = {text};
     const response = await client.post("/fakeApi/todos", {todo: initialTodo});
-    dispatch({type: "todos/todoAdded", payload: response.todo});
+    dispatch(todoAdded(response.todo));
   };
-};
 
-export {fetchTodos, saveNewTodo};
+export default todosReducer;

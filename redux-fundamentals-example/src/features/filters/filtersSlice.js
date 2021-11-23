@@ -9,7 +9,7 @@ const initiateState = {
   colors: []
 };
 
-export default function filtersReducer(state = initiateState, action) {
+const filtersReducer = (state = initiateState, action) => {
   switch (action.type) {
     case "filters/statusFilterChanged": {
       return {
@@ -48,3 +48,16 @@ export default function filtersReducer(state = initiateState, action) {
       return state;
   }
 };
+
+// Action Creators
+export const statusFilterChanged = status => ({
+  type: "filters/statusFilterChanged",
+  payload: status
+});
+
+export const colorFilterChanged = (color, changeType) => ({
+  type: "filters/colorFilterChanged",
+  payload: {color, changeType}
+});
+
+export default filtersReducer;
