@@ -1,4 +1,6 @@
 import {client} from "../../api/client";
+import {createSelector} from "reselect";
+import {StatusFilters} from "../filters/filtersSlice";
 
 const initialState = [];
 
@@ -78,6 +80,30 @@ export const todosLoaded = todos => ({
   payload: todos
 });
 
+// Create Selector
+export const selectFilteredTodos = createSelector(
+  state => state.todos,
+  state => state.filters,
+  (todos, filters) => {
+    const {status, colors} = filters;
+    const showAllCompletions = status === StatusFilters.All;
+    if (showAllCompletions && colors.length === 0) {
+      return todos;
+    }
+    const completedStatus = status === StatusFilters.Completed;
+    return todos.filter(todo => {
+      const statusMatches = showAllCompletions || todo.completed === completedStatus;
+      const colorMatches = colors.length === 0 || colors.includes(todo.color)
+      return statusMatches && colorMatches;
+    });
+  }
+);
+
+export const selectFilteredTodoIds = createSelector(
+  selectFilteredTodos,
+  filteredTodos => filteredTodos.map(todo => todo.id)
+);
+
 // Thunk function
 export const fetchTodos = () =>
   async dispatch => {
@@ -91,5 +117,10 @@ export const saveNewTodo = (text) =>
     const response = await client.post("/fakeApi/todos", {todo: initialTodo});
     dispatch(todoAdded(response.todo));
   };
+
+export const selectTodos = state => state.todos;
+
+export const selectTodoById = (state, todoId) =>
+  selectTodos(state).find(todo => todo.id === todoId);
 
 export default todosReducer;
