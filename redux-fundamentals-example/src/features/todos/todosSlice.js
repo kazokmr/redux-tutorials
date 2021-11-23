@@ -1,11 +1,17 @@
-import {createAsyncThunk, createSelector, createSlice} from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice
+} from "@reduxjs/toolkit";
 import {client} from "../../api/client";
 import {StatusFilters} from "../filters/filtersSlice";
 
-const initialState = {
+const todosAdapter = createEntityAdapter();
+
+const initialState = todosAdapter.getInitialState({
   status: 'idle',
-  entities: {}
-};
+});
 
 // Thunk function
 export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
@@ -23,10 +29,6 @@ const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    todoAdded(state, action) {
-      const todo = action.payload;
-      state.entities[todo.id] = todo;
-    },
     todoToggled(state, action) {
       const todoId = action.payload;
       const todo = state.entities[todoId];
@@ -43,56 +45,44 @@ const todosSlice = createSlice({
         };
       },
     },
-    todoDeleted(state, action) {
-      delete state.entities[action.payload];
-    },
+    todoDeleted: todosAdapter.removeOne,
     allTodoCompleted(state) {
       Object.values(state.entities).forEach(todo => todo.completed = true);
     },
     completedCleared(state) {
-      Object.values(state.entities).forEach(todo => {
-        if (todo.completed) {
-          delete state.entities[todo.id];
-        }
-      });
+      const completedIs = Object.values(state.entities)
+        .filter(todo => todo.completed)
+        .map(todo => todo.id);
+      todosAdapter.removeMany(state, completedIs);
     },
-    todosLoading(state) {
-      state.status = "loading";
-    },
-    todosLoaded(state, action) {
-      const newEntities = {}
-      action.payload.forEach(todo => newEntities[todo.id] = todo);
-      state.status = "idle";
-      state.entities = newEntities;
-    }
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchTodos.pending, (state, action) => {
+      .addCase(fetchTodos.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        const newEntities = {}
-        action.payload.forEach(todo => newEntities[todo.id] = todo);
+        todosAdapter.setAll(state, action.payload);
         state.status = "idle";
-        state.entities = newEntities;
       })
-      .addCase(saveNewTodo.fulfilled, (state, action) => {
-        const todo = action.payload;
-        state.entities[todo.id] = todo;
-      });
+      .addCase(saveNewTodo.fulfilled, todosAdapter.addOne);
   }
 });
 
+export const {
+  todoToggled,
+  todoColorSelected,
+  todoDeleted,
+  allTodoCompleted,
+  completedCleared,
+} = todosSlice.actions
+
+export default todosSlice.reducer;
+
 // Create Selector
-export const selectTodoEntities = state => state.todos.entities;
-
-export const selectTodos = createSelector(selectTodoEntities, entities =>
-  Object.values(entities)
-);
-
-export const selectTodoById = (state, todoId) =>
-  selectTodoEntities(state)[todoId]
+// todosAdapterのSelectorでselectAllやselectByIdがあるので、それらの別名を定義して外部から利用できるようにする
+export const {selectAll: selectTodos, selectById: selectTodoById} =
+  todosAdapter.getSelectors(state => state.todos);
 
 export const selectTodoIds = createSelector(
   selectTodos,
@@ -121,16 +111,3 @@ export const selectFilteredTodoIds = createSelector(
   selectFilteredTodos,
   filteredTodos => filteredTodos.map(todo => todo.id)
 );
-
-export const {
-  todoAdded,
-  todoToggled,
-  todoColorSelected,
-  todoDeleted,
-  allTodoCompleted,
-  completedCleared,
-  todosLoading,
-  todosLoaded,
-} = todosSlice.actions
-
-export default todosSlice.reducer;
