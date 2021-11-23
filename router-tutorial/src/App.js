@@ -1,8 +1,8 @@
-import {Link} from "react-router-dom";
+import {Link, Outlet} from "react-router-dom";
 
 export const App = () => {
   return (
-    <dir>
+    <div>
       <h1>Bookkeeper!</h1>
       <nav
         style={{
@@ -13,7 +13,8 @@ export const App = () => {
         <Link to="/invoices">Invoices</Link> |{" "}
         <Link to="/expenses">Expenses</Link>
       </nav>
-    </dir>
+      <Outlet/>
+    </div>
   );
 }
 
