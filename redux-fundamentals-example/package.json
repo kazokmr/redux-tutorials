@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^1.6.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -11,12 +12,9 @@
     "miragejs": "^0.1.42",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
     "react-redux": "^7.2.6",
-    "redux": "^4.1.2",
-    "redux-thunk": "^2.4.0",
+    "react-scripts": "4.0.3",
     "redux-devtools-extension": "^2.13.9",
-    "reselect": "^4.1.4",
     "seedrandom": "^3.0.5"
   },
   "scripts": {
