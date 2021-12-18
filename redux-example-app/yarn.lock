@@ -1996,10 +1996,10 @@
     "@types/set-cookie-parser" "^2.4.0"
     set-cookie-parser "^2.4.6"
 
-"@mswjs/data@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@mswjs/data/-/data-0.8.0.tgz#6d1598d5542774a7c41a6a3da27ecb4a073b07c7"
-  integrity sha512-Z8fxyupSDQjX7klTXgUurCbcYYIaQX9WkahMuFQS/oesWxeww4Ql1SWz3YVkzHso95Px4JYSpz9Yi/X24gcq6w==
+"@mswjs/data@^0.8.1":
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@mswjs/data/-/data-0.8.3.tgz#f15122fc745f2f183b16a79cfa4d4182e3a1149f"
+  integrity sha512-j3AwA8elKi2g1G/o4MTQoeLqeH0n9dV1H5ilSg5KqXxG0UGDOqoxuF9aJS/NE203+pyPA+uLQw4FCN2j0erdBw==
   dependencies:
     "@types/lodash" "^4.14.172"
     "@types/md5" "^2.3.0"
