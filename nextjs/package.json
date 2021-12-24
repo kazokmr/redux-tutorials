@@ -12,6 +12,6 @@
     "gray-matter": "^4.0.3",
     "remark": "^14.0.2",
     "remark-html": "^15.0.1",
-    "date-fns": "^2.26.0"
+    "date-fns": "^2.27.0"
   }
 }
