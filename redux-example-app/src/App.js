@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Redirect,
-  Route,
-  Switch,
-} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes,} from "react-router-dom";
 import {Navbar} from "./app/Navbar";
 import {PostsList} from "./features/posts/PostsList";
 import {AddPostForm} from "./features/posts/AddPostForm";
@@ -16,10 +11,10 @@ import {NotificationList} from "./features/notifications/NotificationList";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Navbar/>
       <div className="App">
-        <Switch>
+        <Routes>
           <Route
             exact
             path="/"
@@ -30,15 +25,15 @@ function App() {
               </React.Fragment>
             )}
           />
-          <Route exact path="/posts/:postId" component={SinglePostPage}/>
-          <Route exact path="/editPost/:postId" component={EditPostForm}/>
-          <Route exact path="/users" component={UsersList}/>
-          <Route exact path="/users/:userId" component={UserPage}/>
-          <Route exact path="/notifications" component={NotificationList}/>
-          <Redirect to="/"/>
-        </Switch>
+          <Route exact path="/posts/:postId" element={<SinglePostPage/>}/>
+          <Route exact path="/editPost/:postId" element={<EditPostForm/>}/>
+          <Route exact path="/users" element={<UsersList/>}/>
+          <Route exact path="/users/:userId" element={<UserPage/>}/>
+          <Route exact path="/notifications" element={<NotificationList/>}/>
+        </Routes>
+        <Navigate to="/"/>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

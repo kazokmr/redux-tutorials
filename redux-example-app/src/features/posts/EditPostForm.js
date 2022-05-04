@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useHistory} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useEditPostMutation, useGetPostQuery} from "../api/apiSlice";
 
 export const EditPostForm = ({match}) => {
@@ -11,7 +11,7 @@ export const EditPostForm = ({match}) => {
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
 
-  const history = useHistory();
+  const history = useNavigate();
 
   const onTitleChanged = e => setTitle(e.target.value);
   const onContentChanged = e => setContent(e.target.value);
