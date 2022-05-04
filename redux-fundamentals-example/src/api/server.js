@@ -2,7 +2,7 @@
 
 import {Factory, hasMany, Model, RestSerializer, Server} from 'miragejs'
 
-import faker from 'faker'
+import faker from "@faker-js/faker";
 import seedrandom from 'seedrandom'
 
 const IdSerializer = RestSerializer.extend({
