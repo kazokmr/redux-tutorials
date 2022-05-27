@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@faker-js/faker": "^6.3.1",
+    "@faker-js/faker": "^7.1.0",
     "@reduxjs/toolkit": "^1.8.1",
     "classnames": "^2.3.1",
     "miragejs": "^0.1.43",
